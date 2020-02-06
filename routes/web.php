@@ -13,11 +13,24 @@ use Illuminate\Http\Request;
 */
 // Маршруты аутентификации...
 Route::get('/login', 'LoginController@starts')->name('login');
+Route::post('/login', 'LoginController@starts')->name('login');
 Route::get('/home', 'LoginController@home')->name('home');
-Route::get('request',['uses'=>'RequestController@showrequest']);
-Route::get('/request/{id}/addCorobs','RequestController@addCorobs');
-Route::get('/findcorobs','FindController@show');
-Route::post('/findcorobs','FindController@find');
+Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name('logout');
+
+
+Route::get('request',['middleware' => 'authmidleware','uses'=>'RequestController@showrequest']);
+Route::get('/request/{id}/addCorobs',['middleware' => 'authmidleware','uses'=>'RequestController@addCorobs']);
+Route::get('/request/{id}/',['middleware' => 'authmidleware','uses'=>'RequestController@requestinfo'])->where('id', '[0-9]+');
+Route::get('request/add',['middleware' => 'authmidleware','uses'=>'RequestController@createParametrs']);
+
+
+Route::get('business_processes',['middleware' => 'authmidleware','uses'=>'BpController@show']);
+
+
+
+
+Route::get('/findcorobs',['middleware' => 'authmidleware','uses'=>'FindController@show']);
+Route::post('/findcorobs',['middleware' => 'authmidleware','uses'=>'FindController@find']);
 
 
 Route::post('/requestajax/{id}/addCorobs','RequestAjaxController@addCorobs');
@@ -25,6 +38,9 @@ Route::get('/requestajax/{id}/addCorobs' ,function () {
   abort(404);
 });
 
+Route::get('/test',function(){
+	return "Авторизация успешна и дальше редирект";
+})->middleware('authmidleware'); 
 
 // Route::post('auth/login', 'Auth\AuthController@postLogin');
 // Route::get('auth/logout', 'Auth\AuthController@getLogout');
@@ -35,13 +51,11 @@ Route::get('/requestajax/{id}/addCorobs' ,function () {
 
 Route::get('/', function () {
     return view('tasks');
-});
-Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout');
-Route::get('request/add',['uses'=>'RequestController@createParametrs']);
+})->middleware('authmidleware'); 
 
-Route::get('/foo', function () {
-  return 'Hello World';
-});
+
+
+
 
 
 
@@ -72,7 +86,7 @@ Route::group(['prefix' => 'api'], function ($tokens) {
 
  // Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+// Route::get('/home', 'HomeController@index')->name('home');
 
 // Auth::routes();
 

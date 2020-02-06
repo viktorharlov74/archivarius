@@ -20,36 +20,28 @@
     <div class="container">
     <div class="row">
          <div class="col-md-6 offset-3">
-            <div class="title m-b-md">Текущие заявки</div>
+            <div class="title m-b-md">Текущие короба по заявке <?=$id?></div>
          </div>
          <div class="col-md-3"></div>
      </div>                 
         
         <div class="row mt-3">
-            <div class="col-md-2">Город</div>
-            <div class="col-md-2">Адресс</div>
-            <div class="col-md-2">Организация</div>
-            <div class="col-md-2">БП</div>
-            <div class="col-md-2">Время-начала</div>            
-            <div class="col-md-1">Коробов</div>
-            <div class="col-md-1">Кнопки</div>
-        </div>
-        <?php if (count($zaiv)!=0){
-          foreach ($zaiv as $id=>$req) {?>
-           <div class="row  mt-3">
-            <div class="col-md-2"><?=$req['sity']; ?></div>
-            <div class="col-md-2"><?=$req['adr']; ?></div>
-            <div class="col-md-2"><?=$req['org'] ?></div>
-            <div class="col-md-2"><?=$req['bp'] ?></div>                        
-            <div class="col-md-2"><?=$req['start'] ?></div>
-            <div class="col-md-1"><?=$req['allcorobs'] ?></div>
-            <div class="col-md-1"><a href="request/<?=$id?>">Короба</a></div>
+            <div class="col-md-3">Контейнер</div>
+            <div class="col-md-3">Дедлайн</div>
+            <div class="col-md-3">Контейнер</div>
+            <div class="col-md-3">Дедлайн</div>
 
-            </div>  
-         <?}
-         dump($zaiv);
-        }?>
-    
+        </div>
+         <div class="row mt-3">
+       <?php foreach ($containers as $container ) {?>
+        <!-- <?var_dump($container);?> -->
+        <div class="col-md-3">{{$container->barcode}}</div>
+        <div class="col-md-3">{{$container->deadline}}</div>
+
+
+
+       <?}?>
+        </div>  
     
     <div class="row mt-3">
 
@@ -60,14 +52,14 @@
                 <button id="btn-prev" type="button" class="btn btn-default btn-block">Назад</button>
             </div> -->
 
-            <div class=" offset-sm-6 col-sm-3" style="text-align: right;">
-                <a href="/request/add"  id="btn-create-request" class="btn btn-primary btn-block " >Создать заявку
-                </a>
+<!--             <div class=" offset-sm-6 col-sm-3" style="text-align: right;">
+                <button type="submit" id="btn-create-request" class="btn btn-primary btn-block " >Добавить короба
+                </button>
                 
             </div>
             <div class="col-sm-3">
 
-        </div>
+        </div> -->
     </div>
     </div>
         <script type="text/javascript">
@@ -143,7 +135,7 @@
                     //     });
 
                     // });
-                
+                });
              
         </script>
 

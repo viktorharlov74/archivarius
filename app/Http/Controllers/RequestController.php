@@ -3,15 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Requests;
+use App\RequestInfo;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
 class RequestController extends Controller
 {
+
+  public function requestinfo(Request $request){
+
+  	$id=$request->id;
+  	$containers=new RequestInfo($id);
+  	$sd=$containers->showContainers();
+  	// dump($sd);
+  	return view('requestinfo',['id'=>$id,'containers'=>$sd]);
+  }
+
   public function showrequest(){
-  	$requests=Requests::find();
-  	dump($requests);
+  	$requests_obj=new Requests;
+  	$requests=$requests_obj->find();
   	return view('requests',["zaiv"=>$requests]);
   }
 
@@ -54,7 +66,7 @@ class RequestController extends Controller
 		      $arr_city[$city->id]=$city->city;
 		      # code...
 		    }
-		    // var_dump($arr_city);
+		    dump($arr_city);
 		    return view('requestadd', ['city' =>  $arr_city,'organizatinon'=>$client_organisation_arr,'arr_bp'=>$arr_bp,'sklad'=>$arr_sklad]);
 	  }
 

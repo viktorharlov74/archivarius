@@ -13,10 +13,15 @@ use App\Http\Controllers\Controller;
 //для версии 5.1 и ранее:
 //use Illuminate\Routing\Controller;
 
-class LoginController extends Controller
+class AuthmidlewareController extends Controller
 //для версии 5.2 и ранее:
 //class AuthController extends Controller
 {
+
+  public function __construct()
+  {
+    // echo "Вызов конструктора";
+  }
   /**
     * Обработка попытки аутентификации
     *
@@ -62,17 +67,14 @@ class LoginController extends Controller
     return $input_text;
   }
 
-  public function starts(Request $request){
+  public function checkAuthRequest(Request $request){
     // echo "То что у нас в сессии сейчас\n";
     //  print_r($request->session()->all());
 
    if ($request->session()->has('user'))
    {
-    $user_id=$request->session()->get('user');
-    // echo "Пользователь успешно авторизован".$user_id;
-
-    // print_r($request->session()->all());
-    return view('home');
+      $user_id=$request->session()->get('user');
+      return true;
    }
    else{
     // echo (isset($request->login)." -----");
@@ -96,7 +98,7 @@ class LoginController extends Controller
 
              // $value_sessions = $request->session()->get(13);
              // echo "Сессия ". $value_sessions;
-          echo "успешно авторизованы без сесии";
+          // echo "успешно авторизованы без сесии";
           return view('home');
         }
         else{
@@ -109,8 +111,7 @@ class LoginController extends Controller
 
 
     // print_r($request->session());
-    // echo "Вы не авторизованы, авторизуйтесь";
-    return view('login',['eror' => '']);
+    return false;
    }  
        // $value = $request->session();
         
@@ -120,11 +121,6 @@ class LoginController extends Controller
     // }
 
 
-  }
-
-
-  public function home(Request $request) {
-    return view('/home');
   }
 public function logout(Request $request) {
   Auth::logout();

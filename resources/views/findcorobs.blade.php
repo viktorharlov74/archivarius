@@ -25,7 +25,10 @@
          </div>
          <div class="col-md-3"></div>
      </div>                 
-        <?php if (isset($res)){?>
+        <?php if (isset($res)){
+            if (count($res)>0){
+            ?>
+
              <div class="row" style="text-align: center;">
                  <div class="col-md-6 offset-3">
                     <div class=".title" style="text-align: center;"><h2>Результат поиска коробов:</h2></div>
@@ -37,18 +40,20 @@
               <div class="col-md-3 headercorobs">Организация</div>
               <div class="col-md-3 headercorobs">Адресс ячейки</div>
               <div class="col-md-3 headercorobs">Статус</div>
-          <? foreach ($res as $corobs) {
-              foreach ($corobs as $key => $value) {
-                ?><div class="col-md-3"><?=$value['barcode']?></div><?
-                ?><div class="col-md-3"><?=$value['org']?></div><?
-                ?><div class="col-md-3"><?=$value['cellcode']?></div><?
-                ?><div class="col-md-3"><?=$value['status']?></div><?
+            <? foreach ($res as $corobs) {
+                foreach ($corobs as $key => $value) {
+                  ?><div class="col-md-3"><?=$value['barcode']?></div><?
+                  ?><div class="col-md-3"><?=$value['org']?></div><?
+                  ?><div class="col-md-3"><?=$value['cellcode']?></div><?
+                  ?><div class="col-md-3"><?=$value['status']?></div><?
 
-              }
-            }?>
+                }
+              }?>
             </div>
-       <? }?> 
-      <?php if (isset($not_found)){?>
+       <? }}?> 
+      <?php if (isset($not_found)){
+         if (count($not_found)>0){
+        ?>
         <div class="row mt-3" style="text-align: center;">
                  <div class="col-md-6 offset-3">
                     <div class=".title"  style="text-align: center;"><h2>Короба которые не нашлись:</h2> </div>
@@ -60,7 +65,7 @@
                 ?><div class="col-md-12"><?= $corobs?></div><?
                }?>
               </div>
-        <?}?>
+        <?}}?>
 
         <div class="row mt-3">
            <form class="col-md-6 offset-3" action="" method="post">
