@@ -21,12 +21,17 @@ Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name(
 Route::get('request',['middleware' => 'authmidleware','uses'=>'RequestController@showrequest']);
 Route::get('/request/{id}/addCorobs',['middleware' => 'authmidleware','uses'=>'RequestController@addCorobs']);
 Route::get('/request/{id}/',['middleware' => 'authmidleware','uses'=>'RequestController@requestinfo'])->where('id', '[0-9]+');
+Route::get('/request/{id}/closeStep/{id_step}',['middleware' => 'authmidleware','uses'=>'RequestController@closeStep'])->where(['id'=>'[0-9]+','id_step'=>'[0-9]+']);
+
 Route::get('request/add',['middleware' => 'authmidleware','uses'=>'RequestController@createParametrs']);
 
 
+
 Route::get('business_processes',['middleware' => 'authmidleware','uses'=>'BpController@show']);
+Route::get('business_processes/{id}/',['middleware' => 'authmidleware','uses'=>'BpController@stepsBp'])->where('id', '[0-9]+');
 
 
+Route::middleware('auth:api')->get('/user', function (Request $request) { return $request->user(); });
 
 
 Route::get('/findcorobs',['middleware' => 'authmidleware','uses'=>'FindController@show']);
@@ -34,7 +39,26 @@ Route::post('/findcorobs',['middleware' => 'authmidleware','uses'=>'FindControll
 
 
 Route::post('/requestajax/{id}/addCorobs','RequestAjaxController@addCorobs');
-Route::get('/requestajax/{id}/addCorobs' ,function () {
+Route::get('/requestajax/{id}/addCorobs' ,function () {  abort(404);});
+
+
+Route::post('/requestajax/{id}/checkCorobs	','RequestAjaxController@checkCorobs')->where(['id'=>'[0-9]+']);
+
+Route::post('/requestajax/getInfoCell	','RequestAjaxController@getInfoCell');
+
+
+Route::post('/requestajax/{id}/getInfoCorobs','RequestAjaxController@getInfoCorobs')->where(['id'=>'[0-9]+']);
+
+Route::post('/requestajax/{id}/closeStep/{id_step}','RequestAjaxController@closeStep')->where(['id'=>'[0-9]+','id_step'=>'[0-9]+']);
+Route::get('/requestajax/{id}/closeStep/{id_step}',function () {  abort(404);})->where(['id'=>'[0-9]+','id_step'=>'[0-9]+']);
+
+
+Route::post('/requestajax/{id}/closenocheck/{id_step}','RequestAjaxController@closenocheckStep')->where(['id'=>'[0-9]+','id_step'=>'[0-9]+']);
+
+
+
+
+Route::get('/requestajax/{id}/checkCorobs' ,function () {
   abort(404);
 });
 
@@ -85,6 +109,10 @@ Route::group(['prefix' => 'api'], function ($tokens) {
 
 
  // Auth::routes();
+
+// Route::get('/home', 'HomeController@index')->name('home');
+
+// Auth::routes();
 
 // Route::get('/home', 'HomeController@index')->name('home');
 

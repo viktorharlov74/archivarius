@@ -18,7 +18,33 @@
 
 
     <div class="container">
+              <div class="row">
+
+             <div class="col-md-8 offset-2">
+                <h3 class="title m-b-md">Короба которые были добавленны ранее</h3>
+             </div>
+             <div class="col-md-2"></div> 
+        </div>
+      <div class="row mt-3">
+         
+            <div class="col-md-3">Контейнер</div>
+            <div class="col-md-3">Дедлайн</div>
+            <div class="col-md-3">Контейнер</div>
+            <div class="col-md-3">Дедлайн</div>
+
+        </div>
+        <div class="row mt-2">
+       <?php if (count($containers)>0){ foreach ($containers as $container ) {?>
+            <!-- <?var_dump($container);?> -->
+            <div class="col-md-3">{{$container->barcode}}</div>
+            <div class="col-md-3">{{$container->deadline}}</div>
+
+
+
+       <?}}?>
+        </div>  
         <div class="row">
+
              <div class="col-md-6 offset-3">
                 <div class="title m-b-md">Добавление коробов в заявку</div>
              </div>
@@ -35,19 +61,19 @@
 
                
                <!-- <div class="test" id="test"></div> -->
-               <!-- <button type="submit" class="btn btn-primary">Submit</button> -->
+               
            
              
         </div>
         </form>
-
+        <button type="submit" class="btn btn-primary">Завершить добавление коробов</button>
     </div>
         <script type="text/javascript">
 
-            function sendContainerAjax(container){
+            function sendContainerAjax(container,pole){
               //TODO: Добавить фронт проверку на ошибки
               $.ajax({
-                url: '/requestajax/1236/addCorobs',
+                url: '/requestajax/<?=$id_request?>/addCorobs',
                 method: 'post',
                   dataType: 'html',
                 headers: {
@@ -55,6 +81,8 @@
                   },
                 data: {corobs: container},
                 success: function(data){
+                  str_date='<div id="res123">'+data+'</div>';
+                  pole.after(str_date);
                   console.log("Данные вернулись успешно");
                 }
               });
@@ -78,7 +106,7 @@
                             if (allcorobs.indexOf($(this).val())=="-1"){
                                 allcorobs.push($(this).val());
                                 if(navigator.onLine) {
-                                  sendContainerAjax($(this).val());
+                                  sendContainerAjax($(this).val(),$(this));
                                   $(this).prop('disabled',true);
                                   //TODO: Добавить фронт проверку на ошибки
                                 }

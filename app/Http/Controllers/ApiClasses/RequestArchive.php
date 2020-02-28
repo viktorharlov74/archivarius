@@ -49,6 +49,12 @@ class RequestArchive extends PublicationCheck{
       return false;
     }
   }
+
+  public function findContainer($corob){
+    $res=DB::table('container')->where('barcode',$corob)->get()->first();
+    dump($res);
+    return $res;
+  }
   public function addContainer($corob){
 
     $id=DB::table('container')->insertGetId([
@@ -67,13 +73,14 @@ class RequestArchive extends PublicationCheck{
   public function addContainersReq($corobs){
     if ($this->acses==true){
       foreach ($corobs as $corob) {
-        $id=$this->addContainer($corob);
+        $this->findContainer($corob);
+        /*$id=$this->addContainer($corob);
          $rez=DB::table('container_request')->insertGetId([
           'container'=>$id,
           'request'=>$this->id,
          ]);
          $this->containers_num+=1;
-         DB::table('request')->where('id',$this->id)->update(['containers_num' => $this->containers_num]);
+         DB::table('request')->where('id',$this->id)->update(['containers_num' => $this->containers_num]);*/
 
         # code...
       }

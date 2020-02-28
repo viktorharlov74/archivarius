@@ -6,7 +6,7 @@ use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-
+use App\StepModel;
 
 abstract class PublicationCheck {
   abstract public function checkAcsessBD();
@@ -61,15 +61,18 @@ class RequestArchive extends PublicationCheck{
     function __construct($id)
   {
     $this->id=$id;
+    $this->containers=DB::table('container_request')->where('request',$id)->get();
     $this->acses=false;
   }
-    public function Clear($str){
+
+public function Clear($str){
 
     $input_text = trim($str);
     $input_text = htmlspecialchars($input_text);
     // $input_text = mysql_escape_string($input_text);
     return $input_text;
   }
+
   public function checkAcsessBD(){
     $id = $this->Clear($this->id);
     $results = DB::table('request')->where([
@@ -95,19 +98,55 @@ class RequestArchive extends PublicationCheck{
       return false;
     }
   }
-  public function getContainerId($codecorob){
+
+  public function updateContainerStatus($containerId,$new_status_id)
+  {
+     $res=DB::table('container')->where('id',$containerId)->update(['status_id' => $new_status_id]);
+     return $res;
+  }
+
+//TODO Надо сделать проверку, если такой короб есть то смотреть его статус и какой компании принадлежит
+  public function checkUniqContainer($codecorob){
     $corobs_id=DB::table('container')->where('barcode',$codecorob)->get();
     if (count($corobs_id)!=0){
-      echo $corobs_id->first()->barcode." Такой короб уже есть";
-      return $corobs_id;
-    }
+        if ($corobs_id->first()->status_id==4){
+
+          if ($corobs_id->first()->organisation_id==$this->organisation_id){
+             return $corobs_id;
+          }
+          else{ echo "BIG FAIL! Короб времено изъят но принадлежит другой компнаии"; return -1;}
+        }
+        else
+        {
+          echo $corobs_id->first()->barcode." короб уже есть в общем списке коробов и является дубликатом";
+          return -1;  
+        }       
+      }
     return array();
   }
+
+  public function getContainerReq($codecorob){
+    $corobs_arr=DB::table('container')->where('barcode',$codecorob)->get();
+    // dump($corobs_arr);
+    foreach ($corobs_arr as $corob) {
+      $container_res=DB::table('container_request')->where(['container'=>$corob->id,'request'=>$this->id])->get();
+    if (count($container_res)==1){
+      return $corob->id;
+    }
+      // dump($container_res);
+    }
+    return -1;
+  }
+
   public function addContainer($corob){
 
-    $id_arr=$this->getContainerId($corob);
+    $id_arr=$this->checkUniqContainer($corob);
     // var_dump($id_arr);
-     if (count($id_arr)==0){
+    if (gettype($id_arr)=="integer"){
+        return -1;
+    }
+    else{
+      if (count($id_arr)==0){
        $id=DB::table('container')->insertGetId([
                'status_id' => $this->status_id,
                'barcode' => $corob,
@@ -121,16 +160,23 @@ class RequestArchive extends PublicationCheck{
        echo "Добавляю контейнер в список коробов";
        return $id;
      }
-     else return $id_arr->first()->id;    
+     else {
+
+        return $id_arr->first()->id;
+     }
+    }
   }
 
   public function addContainerReq($corob){
     if ($this->acses==true){
       $id=$this->addContainer($corob);
+       if (gettype($id)=="integer"){
+        if ($id==-1) return false;
+       }
       $count_container=DB::table('container_request')->where(['container'=>$id,'request'=>$this->id,])->get();
       //TODO: надо проверить нету ли контайров в другой активной заявки
       if (count($count_container)!=0){
-         echo "Этот короб уже добавлен";
+         echo "Этот короб уже добавлен в заявку";
           return false;
       }
        $rez=DB::table('container_request')->insertGetId([
@@ -142,27 +188,56 @@ class RequestArchive extends PublicationCheck{
        return true;
     }
   }
+
   public function addContainersReq($corobs){
     if ($this->acses==true){
       foreach ($corobs as $corob) {
-        $id=$this->addContainer($corob);
-        $count_container=DB::table('container_request')->where(['container'=>$id,'request'=>$this->id,])->get();
-        if (count($count_container)!=0){
-          echo "Этот короб уже добавлен";
-            continue;
-        }
-         $rez=DB::table('container_request')->insertGetId([
-          'container'=>$id,
-          'request'=>$this->id,
-         ]);
-         $this->containers_num+=1;
-         DB::table('request')->where('id',$this->id)->update(['containers_num' => $this->containers_num]);
+        $this->addContainerReq($corob);
+        // $id=$this->addContainer($corob);
+        // $count_container=DB::table('container_request')->where(['container'=>$id,'request'=>$this->id,])->get();
+        // if (count($count_container)!=0){
+        //   echo "Этот короб уже добавлен";
+        //     continue;
+        // }
+        //  $rez=DB::table('container_request')->insertGetId([
+        //   'container'=>$id,
+        //   'request'=>$this->id,
+        //  ]);
+        //  $this->containers_num+=1;
+        //  DB::table('request')->where('id',$this->id)->update(['containers_num' => $this->containers_num]);
 
         # code...
       }
     }
-
   }
+
+  public function checkContainerReq($corob,$next_status_id){
+    if ($this->acses==true){
+      $id_corob=$this->getContainerReq($corob);
+      if ($id_corob!=-1){
+        $res= $this->updateContainerStatus($id_corob,$next_status_id);
+        if ($res==1) echo "Короб успешно отсканирован ";
+        else echo "Ошибка";
+      }
+      else echo "Контейнера нет в заявке.";
+    }
+  }
+
+  public function getOstCorobs($next_status_id)
+  {
+    $count_containers=count($this->containers);
+    $count_ost=0;
+    $count_scan=0;
+    foreach ($this->containers as $container) {
+      $container_new_status=DB::table('container')->where(['id'=> $container->container,'status_id'=>$next_status_id])->get()->first();
+      if (count($container_new_status)!=0){
+        $count_scan++;
+      }
+      else{$count_ost++;}
+    }
+    return array('all'=>$count_containers,'scan'=>$count_scan,'ost'=>$count_ost);
+  }
+
 }
 
 

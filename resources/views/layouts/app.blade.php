@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="ru">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,6 +21,45 @@
                 height: 100vh;
                 font-size: 14px;
                 margin: 0;
+            }
+            .cell-control{
+                margin-bottom: 10px;
+                display: block;
+                width: 100%;
+                height: calc(2.19rem + 2px);
+                padding: .375rem .75rem;
+                font-size: .9rem;
+                line-height: 1.6;
+                color:
+                #495057;
+                background-color:
+                #fff;
+                background-clip: padding-box;
+                border: 1px solid
+                #ced4da;
+                border-radius: .25rem;
+                transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+            }
+            .cell-control::placeholder {
+                color: 
+                #6c757d;
+                opacity: 1;
+            }
+            .cell-control:focus {
+                    color: 
+                #495057;
+                background-color:
+                #fff;
+                border-color:
+                #a1cbef;
+                outline: 0;
+                box-shadow: 0 0 0 .2rem
+                    rgba(52,144,220,.25);
+                }
+            .cell-control:disabled, .cell-control[readonly] {
+                background-color: 
+                #e9ecef;
+                opacity: 1;
             }
             .form-control{
                 margin-bottom: 10px;
@@ -54,7 +93,7 @@
             }
 
             .title {
-                font-size: 48px;
+                font-size: 36px;
                 text-align: center;
             }
 

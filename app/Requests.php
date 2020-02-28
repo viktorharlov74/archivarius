@@ -27,7 +27,7 @@ class Requests extends Model
 		$this->arr_req=$arr_req;
 		
 	}
-	public function find(){
+	public function getRequsets(){
 		  // $arr_req=DB::table('request')->where('finished',0)->get();
 		return   $this->arr_req;
 	}

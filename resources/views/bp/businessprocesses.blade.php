@@ -32,9 +32,9 @@
 
         </div>
         <div class="row mt-3">
-       <?php foreach ($arr_bp as $bp_name=>$count_steps ) {?>
-            <div class="col-md-4 offset-2"><?=$bp_name?></div>
-            <div class="col-md-4  offset-2"><?=$count_steps?></div>
+       <?php foreach ($arr_bp as $id=>$bp_info) {?>
+            <div class="col-md-4 offset-2"><a href="/business_processes/<?=$id?>"><?=$bp_info['name']?></a> </div>
+            <div class="col-md-4  offset-2"><?=$bp_info['count']?></div>
 
        <?}?>
         </div>  

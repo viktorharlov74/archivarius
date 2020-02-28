@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Requests;
 use App\RequestInfo;
+use App\StepModel;
+
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -12,23 +14,100 @@ use App\Http\Controllers\Controller;
 class RequestController extends Controller
 {
 
-  public function requestinfo(Request $request){
+  public function requestinfo(Request $request)
+  {
 
-  	$id=$request->id;
-  	$containers=new RequestInfo($id);
-  	$sd=$containers->showContainers();
-  	// dump($sd);
-  	return view('requestinfo',['id'=>$id,'containers'=>$sd]);
+	  	$id=$request->id;
+	  	$reqInfo=new RequestInfo($id);
+	  	$containers=$reqInfo->showContainers();
+	  	$curent_steps=$reqInfo->currentStep();
+	  	 $requests_obj=new Requests;
+	  	$requests=$requests_obj->getRequsets();
+	  	// dump($sd);
+	  	return view('requestinfo',['id'=>$id,'containers'=>$containers,'curent_steps'=>$curent_steps]);
+  }
+
+  public function closeStep(Request $request)
+  {
+	$id=$this->Clear($request->id);
+  	$reqInfo=new RequestInfo($id);
+  	$containers=$reqInfo->showContainers();
+  	$step=new StepModel($id,$request->id_step);
+  	$curent_step=$reqInfo->getCurrentStep();
+  	echo "Текущий шаги заявкasи";
+  	dump($curent_step);
+  	if ($curent_step!=$request->id_step){
+  		return view ('closestep/eror_no_close_step',["id_request"=>$request->id]);
+  		// return "";
+  	}
+  	$step_id=$step->getTypeStep();
+  	//dump ($step);
+
+  	switch ($step_id->id) {
+  		case 1:
+  			return view ('closestep/zabor_corobs',["id_request"=>$id,'containers'=>$containers,'step_model'=>$step]);
+  			break;
+
+  		case 2:
+  		echo "проверка шага со сканированием коробов";
+  		return view ('closestep/checkcodecorobs',["id_request"=>$id,'containers'=>$containers,'step_model'=>$step]);
+  			break;
+
+  		case 3:
+  			return view ('closestep/closestep_no_check',["id_request"=>$id,'step_model'=>$step]);
+  			break;
+
+  		case 5:
+  			return view ('closestep/pogruzka_na_polki',["id_request"=>$id,'containers'=>$containers,'step_model'=>$step]);
+  			break;
+  		
+  		default:
+  			return "Выполняется закрытие шага";
+  			break;
+  	}
+
+  	/*
+	1 забор у клиента
+2 погрузка в машину
+3 транспортировка
+
+4 прием складом
+5 размещение на складе
+6 ручное размещение на складе
+7 автоматическое размещение на складе
+8 забор со склада
+9 прием экспедитором
+10 прием клиентом
+11 временное изъятие контейнера
+12 безвозвратное изъятие контейнера
+
+
+  	*/
+
+  	/*
+		6-Без проверки
+		5-По запросу
+		7-Проверка дубликатов контейнеров
+		2=Проверка кодов контейнеров
+		3=Проверка кодов контейнеров и ячеек
+		4=Проверка кодов контейнеров и ячеек (авто)
+		1-Проверка количества контейнеров (от забора до) 
+		*/
+
+  	
   }
 
   public function showrequest(){
-  	$requests_obj=new Requests;
-  	$requests=$requests_obj->find();
-  	return view('requests',["zaiv"=>$requests]);
+	 	$requests_obj=new Requests;
+	  	$requests=$requests_obj->getRequsets();
+	  	return view('requests',["zaiv"=>$requests]);
   }
 
-  public function addCorobs(){
-  	return view ('requestaddCorobs');
+  public function addCorobs(Request $request){
+	$id=$this->Clear($request->id);
+  	$reqInfo=new RequestInfo($id);
+  	$containers=$reqInfo->showContainers();
+  	return view ('requestaddCorobs',["id_request"=>$request->id,'containers'=>$containers]);
   }
   public function createParametrs()
 	  {

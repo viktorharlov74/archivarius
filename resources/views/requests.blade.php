@@ -43,7 +43,7 @@
             <div class="col-md-2"><?=$req['bp'] ?></div>                        
             <div class="col-md-2"><?=$req['start'] ?></div>
             <div class="col-md-1"><?=$req['allcorobs'] ?></div>
-            <div class="col-md-1"><a href="request/<?=$id?>">Короба</a></div>
+            <div class="col-md-1"><a href="request/<?=$id?>">Информация</a></div>
 
             </div>  
          <?}
