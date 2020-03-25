@@ -105,6 +105,7 @@ public function Clear($str){
      return $res;
   }
 
+
 //TODO Надо сделать проверку, если такой короб есть то смотреть его статус и какой компании принадлежит
   public function checkUniqContainer($codecorob){
     $corobs_id=DB::table('container')->where('barcode',$codecorob)->get();
@@ -112,17 +113,16 @@ public function Clear($str){
         if ($corobs_id->first()->status_id==4){
 
           if ($corobs_id->first()->organisation_id==$this->organisation_id){
-             return $corobs_id;
+             return array('res' =>true,'value'=>$corobs_id);
           }
-          else{ echo "BIG FAIL! Короб времено изъят но принадлежит другой компнаии"; return -1;}
+          else{ array('res' =>false,'value'=>"BIG FAIL! Короб времено изъят но принадлежит другой компнаии");}
         }
         else
         {
-          echo $corobs_id->first()->barcode." короб уже есть в общем списке коробов и является дубликатом";
-          return -1;  
+          return array('res' =>false,'value'=>$corobs_id->first()->barcode." короб уже есть в общем списке коробов и является дубликатом");  
         }       
       }
-    return array();
+    return array('res' =>true,'value'=>""); 
   }
 
   public function getContainerReq($codecorob){
@@ -142,11 +142,11 @@ public function Clear($str){
 
     $id_arr=$this->checkUniqContainer($corob);
     // var_dump($id_arr);
-    if (gettype($id_arr)=="integer"){
-        return -1;
+    if ($id_arr['res']==false){
+        return $id_arr;
     }
     else{
-      if (count($id_arr)==0){
+      if ($id_arr['value']==""){
        $id=DB::table('container')->insertGetId([
                'status_id' => $this->status_id,
                'barcode' => $corob,
@@ -157,35 +157,42 @@ public function Clear($str){
                'duplicate'=>0,
                'deadline' => '2023-01-31 00:00:00',
                 ]);
-       echo "Добавляю контейнер в список коробов";
-       return $id;
+       // echo "Добавляю контейнер в список коробов";
+       return array('res' =>true,'value'=> $id); 
      }
      else {
 
-        return $id_arr->first()->id;
+        return array('res' =>true,'value'=>  $id_arr['value']->first()->id); 
      }
     }
   }
+  //$result_arr = array('res' =>"" , value=>"" );
 
   public function addContainerReq($corob){
+     $result_arr = array('res' =>"" , 'value'=>"" );
     if ($this->acses==true){
-      $id=$this->addContainer($corob);
-       if (gettype($id)=="integer"){
-        if ($id==-1) return false;
+      $id_arr=$this->addContainer($corob);
+       if ($id_arr['res']==false){
+        return $id_arr;
        }
-      $count_container=DB::table('container_request')->where(['container'=>$id,'request'=>$this->id,])->get();
+      $count_container=DB::table('container_request')->where(['container'=>$id_arr['value'],'request'=>$this->id,])->get();
       //TODO: надо проверить нету ли контайров в другой активной заявки
       if (count($count_container)!=0){
-         echo "Этот короб уже добавлен в заявку";
-          return false;
+         // echo "Этот короб уже добавлен в заявку";
+          return  array('res' =>false , 'value'=>"Этот короб уже добавлен в заявку");
       }
        $rez=DB::table('container_request')->insertGetId([
-        'container'=>$id,
+        'container'=> $id_arr['value'],
         'request'=>$this->id,
        ]);
        $this->containers_num+=1;
-       DB::table('request')->where('id',$this->id)->update(['containers_num' => $this->containers_num]);
-       return true;
+       $resadd_containers=DB::table('request')->where('id',$this->id)->update(['containers_num' => $this->containers_num]);
+       return array('res' =>true , 'value'=>"Короб успешно добавлен в заявку");
+    }
+    else {
+      $result_arr['res']=false;
+      $result_arr['value']="Нету доступа";
+      return $result_arr;
     }
   }
 
@@ -216,20 +223,34 @@ public function Clear($str){
       $id_corob=$this->getContainerReq($corob);
       if ($id_corob!=-1){
         $res= $this->updateContainerStatus($id_corob,$next_status_id);
-        if ($res==1) echo "Короб успешно отсканирован ";
-        else echo "Ошибка";
+        if ($res==1) return array('res' =>true , 'value'=>"Короб успешно отсканирован" );
+        else return array('res' =>false , 'value'=>"Ошибка изменения статуса короба" );
       }
-      else echo "Контейнера нет в заявке.";
+      else return array('res' =>false , 'value'=>"Такого короба нет в заявке" );
     }
   }
 
-  public function getOstCorobs($next_status_id)
-  {
+  public function getOstCorobs($next_status_id){
     $count_containers=count($this->containers);
     $count_ost=0;
     $count_scan=0;
     foreach ($this->containers as $container) {
       $container_new_status=DB::table('container')->where(['id'=> $container->container,'status_id'=>$next_status_id])->get()->first();
+      if (count($container_new_status)!=0){
+        $count_scan++;
+      }
+      else{$count_ost++;}
+    }
+    return array('all'=>$count_containers,'scan'=>$count_scan,'ost'=>$count_ost);
+  }
+
+
+  public function getCorobInCells($next_status_id){
+    $count_containers=count($this->containers);
+    $count_ost=0;
+    $count_scan=0;
+    foreach ($this->containers as $container) {
+      $container_new_status=DB::table('container')->where([['id','=',$container->container],['cell_id','<>',NULL]])->get()->first();
       if (count($container_new_status)!=0){
         $count_scan++;
       }

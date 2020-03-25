@@ -10,6 +10,7 @@
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,600" rel="stylesheet">
         <link rel="stylesheet" href="/css/app.css">
          <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+         @stack('scripts')
 
         <!-- Styles -->
         <style>
@@ -22,6 +23,15 @@
                 font-size: 14px;
                 margin: 0;
             }
+            
+            .corobsinfo>.row>.col-md-3{
+                text-align: center;
+            }
+            .notice{
+                color: red;
+                text-align: center;
+            }
+
             .cell-control{
                 margin-bottom: 10px;
                 display: block;
@@ -65,7 +75,7 @@
                 margin-bottom: 10px;
             }
             div{
-                font-size: 16px;
+                font-size: 14px;
             }
 
             .full-height {
@@ -118,6 +128,11 @@
                 border: 29px;
                 color: #1b0a0a;
                 margin-bottom: 10px;
+            }
+
+            .form-control[sentserv="false"] {
+                border-color: rebeccapurple;
+                border-width: 2px;
             }
         </style>
        

@@ -19,11 +19,15 @@ Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name(
 
 
 Route::get('request',['middleware' => 'authmidleware','uses'=>'RequestController@showrequest']);
-Route::get('/request/{id}/addCorobs',['middleware' => 'authmidleware','uses'=>'RequestController@addCorobs']);
+Route::get('request/add',['middleware' => 'authmidleware','uses'=>'RequestController@createParametrs']);
+
+
 Route::get('/request/{id}/',['middleware' => 'authmidleware','uses'=>'RequestController@requestinfo'])->where('id', '[0-9]+');
+Route::get('/request/{id}/addCorobs',['middleware' => 'authmidleware','uses'=>'RequestController@addCorobs']);
+
 Route::get('/request/{id}/closeStep/{id_step}',['middleware' => 'authmidleware','uses'=>'RequestController@closeStep'])->where(['id'=>'[0-9]+','id_step'=>'[0-9]+']);
 
-Route::get('request/add',['middleware' => 'authmidleware','uses'=>'RequestController@createParametrs']);
+
 
 
 
@@ -45,12 +49,24 @@ Route::get('/requestajax/{id}/addCorobs' ,function () {  abort(404);});
 Route::post('/requestajax/{id}/checkCorobs	','RequestAjaxController@checkCorobs')->where(['id'=>'[0-9]+']);
 
 Route::post('/requestajax/getInfoCell	','RequestAjaxController@getInfoCell');
+Route::post('requestajax/createRequest', 'RequestAjaxController@createRequest');
 
 
 Route::post('/requestajax/{id}/getInfoCorobs','RequestAjaxController@getInfoCorobs')->where(['id'=>'[0-9]+']);
 
+Route::post('/requestajax/{id}/closeRequest','RequestAjaxController@closeRequest')->where(['id'=>'[0-9]+']);
+Route::post('/requestajax/{id}/cancelRequest','RequestAjaxController@cancelRequest')->where(['id'=>'[0-9]+']);
+
+Route::post('/requestajax/{id}/getInfoCorobsInCells','RequestAjaxController@getInfoCorobsInCells')->where(['id'=>'[0-9]+']);
+
+Route::post('/requestajax/{id}/addContainerInCell','RequestAjaxController@addContainerInCell')->where(['id'=>'[0-9]+']);
+
+
+Route::post('/requestajax/{id}/createAct/{id_step}','RequestAjaxController@createAct')->where(['id'=>'[0-9]+','id_step'=>'[0-9]+']);
+
 Route::post('/requestajax/{id}/closeStep/{id_step}','RequestAjaxController@closeStep')->where(['id'=>'[0-9]+','id_step'=>'[0-9]+']);
 Route::get('/requestajax/{id}/closeStep/{id_step}',function () {  abort(404);})->where(['id'=>'[0-9]+','id_step'=>'[0-9]+']);
+
 
 
 Route::post('/requestajax/{id}/closenocheck/{id_step}','RequestAjaxController@closenocheckStep')->where(['id'=>'[0-9]+','id_step'=>'[0-9]+']);

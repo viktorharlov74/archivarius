@@ -11,15 +11,14 @@ class BpController extends Controller
 {
 	public function show(Request $request)
     {
-    	$Bp=new BpModel();
-    	$arr_bp=$Bp->showAll();
-
+     	$arr_bp=BpModel::showAll();
     	return view('bp/businessprocesses',['arr_bp'=>$arr_bp]);
     }
 
     public function stepsBp(Request $request){
-    	$Bp=new BpModel();
-    	$id=$request->id;
+        $id=$request->id;
+    	$Bp=new BpModel($id);
+    	
     	$arr_steps_bp=$Bp->getSteps($id);
     	$name=$Bp->getNameBp($id);
     	ksort($arr_steps_bp);

@@ -26,24 +26,24 @@
      </div>                 
         
         <div class="row mt-3">
-            <div class="col-md-2">Город</div>
-            <div class="col-md-2">Адресс</div>
-            <div class="col-md-2">Организация</div>
+            <div class="col-md-1">Город</div>
+            <div class="col-md-1">Адресс</div>
+            <div class="col-md-3">Организация</div>
             <div class="col-md-2">БП</div>
             <div class="col-md-2">Время-начала</div>            
             <div class="col-md-1">Коробов</div>
-            <div class="col-md-1">Кнопки</div>
+            <div class="col-md-2"></div>
         </div>
         <?php if (count($zaiv)!=0){
           foreach ($zaiv as $id=>$req) {?>
            <div class="row  mt-3">
-            <div class="col-md-2"><?=$req['sity']; ?></div>
-            <div class="col-md-2"><?=$req['adr']; ?></div>
-            <div class="col-md-2"><?=$req['org'] ?></div>
+            <div class="col-md-1"><?=$req['sity']; ?></div>
+            <div class="col-md-1"><?=$req['adr']; ?></div>
+            <div class="col-md-3"><?=$req['org'] ?></div>
             <div class="col-md-2"><?=$req['bp'] ?></div>                        
             <div class="col-md-2"><?=$req['start'] ?></div>
             <div class="col-md-1"><?=$req['allcorobs'] ?></div>
-            <div class="col-md-1"><a href="request/<?=$id?>">Информация</a></div>
+            <div class="col-md-2"><a href="request/<?=$id?>">Информация</a></div>
 
             </div>  
          <?}

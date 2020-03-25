@@ -38,4 +38,34 @@ class FindCorobs extends Model
     	else return array();
 
     }
+
+        public static function findStaticContainer($container){
+
+        $containers=DB::table('container')->where('barcode',$container)->get();
+        $result_arr=[];
+        if (count($containers)>0){
+            foreach ($containers as $container) {
+                $result_arr=[];
+                $result_arr['id']=$container->id;
+                $result_arr['barcode']=$container->barcode;
+                $cell=DB::table('cell')->where('id',$container->cell_id)->get()->first();
+                $org=DB::table('client_organisation')->where('id',$container->organisation_id)->get()->first();
+                $result_arr['org']=$org->name;
+                if ($cell!=NULL){
+                    $result_arr['cellcode']=$cell->code;
+                }
+                else{
+                    $result_arr['cellcode']="Без ячейки";
+                }
+                
+                $result_arr['status']=DB::table('container_status')->where('id',$container->status_id)->get()->first()->name;
+            }
+            return $result_arr;
+        }
+        else return array();
+
+    }
+
+
+
 }

@@ -11,7 +11,7 @@ class StepModel extends Model
 		$this->id_req=$id_req;
 		$this->id_step=$id_step;
 		$step_info=DB::table('step')->where([['id',$id_step],['request_id',$id_req]])->get();
-		echo "infostep";
+
 		 // var_dump($step_info);
 		// dump($step_type_id);
 		$this->step_type_id=$step_info[0]->step_type_id;
@@ -21,7 +21,7 @@ class StepModel extends Model
 		$this->close_type_id=$step_info[0]->close_type_id;
 
 		 // dump($this->close_type_id);
-		$this->typeStep=DB::table('step_close_type')->where('id',$this->step_type_id)->get()->first();
+		$this->close_type_name=DB::table('step_close_type')->where('id',$this->close_type_id)->get()->first()->name;
 		// dump($this->close_type);
 		/*
 		6-Без проверки
@@ -33,8 +33,11 @@ class StepModel extends Model
 		1-Проверка количества контейнеров (от забора до) 
 		*/
 	}
-	public function getTypeStep(){
-		return $this->typeStep;
+	public function getStepTypeId(){
+		return $this->step_type_id;
+	}
+	public function getCloseTypeNameStep(){
+		return $this->close_type_name;
 	}
 	public function getCloseTypeStep(){
 		return $this->close_type_id;

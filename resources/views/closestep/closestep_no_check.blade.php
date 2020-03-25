@@ -27,12 +27,6 @@
 
          <div class="row" id="rowform">
 
-               <!-- <textarea class="form-control" rows="3" name="corobs_add"></textarea> -->
-                    
-               
-
-               
-               <!-- <div class="test" id="test"></div> -->
 
            
              
@@ -47,83 +41,26 @@
           </div>
         <?}?>
 
-
+      
     </div>
+    <a href='/request/<?=$id_request?>'>Вернуться к заявке</a>
+     <script src="{{ asset('js/main.js') }}"></script>
         <script type="text/javascript">
-
-            function sendContainerAjax(){
-              //TODO: Добавить фронт проверку на ошибки
-              $.ajax({
-                url: '/requestajax/<?=$id_request?>/closenocheck/<?=$step_model->id_step?>',
-                method: 'post',
-                  dataType: 'html',
-                headers: {
-                'X-CSRF-Token':'<?php echo(csrf_token()); ?>'
-                  },
-                data: {id_req:<?=$step_model->id_req?>,id_step:<?=$step_model->id_step?>,next_status_id:<?=$step_model->next_status_id?>,close_type_id:<?=$step_model->close_type_id?>},
-                success: function(data){
-                  // console.log("Данные вернулись успешно");
-                  $('.res').append(data);
-                }
-              });
-            }
-
+            var id_request=<?=$id_request?>;
+            var id_step=<?=$step_model->id_step?>;
+            var next_status_id=<?=$step_model->next_status_id?>;
+            var token='<?php echo(csrf_token()); ?>';
+            var data_info={id_req:<?=$step_model->id_req?>,id_step:<?=$step_model->id_step?>,next_status_id:<?=$step_model->next_status_id?>,close_type_id:<?=$step_model->close_type_id?>};
 
                 // $("#client-city> option[value='3']").value
                 $(document).ready(function(){
 
                   $('#closenocheck').click(function(){
-                    sendContainerAjax();
+                    closeNoCheck($('.res'),id_request,data_info,token);
                     $(this).hide();
                   });
 
 
-                    var id_all=2;
-                    var selector_start="#start";
-                    var allcorobs=[];
-
-                    $(document).on('keypress touchstart', '.form-control', function(e){ 
-                       if (e.which == 13) {
-                        if ($(this).val()==""){
-                            $(this).focus();
-                        }
-                        else{
-                            if (allcorobs.indexOf($(this).val())=="-1"){
-                                allcorobs.push($(this).val());
-                                if(navigator.onLine) {
-                                  sendContainerAjax($(this).val());
-                                  $(this).prop('disabled',true);
-                                  //TODO: Добавить фронт проверку на ошибки
-                                }
-                                else alert("Сети нету");
-                                
-                                
-                                str_id="input"+id_all.toString();
-                                selector="#"+str_id;
-                                id_all+=1;                                
-                                  // alert("Нажата клавиша ентер");
-                                  str='<input type="text" class="form-control" id="' + (str_id)+'" placeholder="Text input">'
-                                   $(selector_start).append(str);
-                                   $(selector).focus();
-                                    if (id_all%80==1){
-                                        $("#rowform").append('<div class="col-sm-12">Новый лист</div>');
-                                    }
-                                   if (id_all%20==1){
-                                    selector_start="start"+(id_all).toString();
-                                    new_stolb=' <div class="col-sm-3"  id="' + (selector_start)+'" > </div>'
-                                        $('#rowform').append(new_stolb);
-                                        selector_start="#"+selector_start;
-                                   }
-                            }
-                            else
-                            {
-                                $(this).val("");
-                                $(this).focus();
-
-                            }
-                        }
-                       }
-                    });
 
 
 

@@ -17,57 +17,42 @@ class RequestController extends Controller
   public function requestinfo(Request $request)
   {
 
-	  	$id=$request->id;
+	  	$id=$this->Clear($request->id);
 	  	$reqInfo=new RequestInfo($id);
 	  	$containers=$reqInfo->showContainers();
-	  	$curent_steps=$reqInfo->currentStep();
-	  	 $requests_obj=new Requests;
-	  	$requests=$requests_obj->getRequsets();
-	  	// dump($sd);
-	  	return view('requestinfo',['id'=>$id,'containers'=>$containers,'curent_steps'=>$curent_steps]);
+	  	$company=$reqInfo->getCompany();
+
+		$curent_steps=$reqInfo->currentStep();
+
+	  	if (!$reqInfo->isFinished()){
+		  	$numer_current_step=$reqInfo->getNumberCurrentStep();
+		  	
+		  	return view('requestinfo',['id'=>$id,'containers'=>$containers,'curent_steps'=>$curent_steps,'numer_current_step'=>$numer_current_step,'company'=>$company,'bp'=>$reqInfo->getBP()]);
+	  	}
+	  	else return view('requestClose',['id'=>$id,'cancel'=>$reqInfo->isCanceled(),'containers'=>$containers,'curent_steps'=>$curent_steps,'company'=>$company,'bp'=>$reqInfo->getBP()]);
+	  	 
   }
 
   public function closeStep(Request $request)
   {
-	$id=$this->Clear($request->id);
+  	$id=$this->Clear($request->id);
+  	$requests_obj=new Requests;
+	$requests=$requests_obj->getRequsets();
+	$company=$requests[$id]['org'];	
   	$reqInfo=new RequestInfo($id);
   	$containers=$reqInfo->showContainers();
   	$step=new StepModel($id,$request->id_step);
   	$curent_step=$reqInfo->getCurrentStep();
-  	echo "Текущий шаги заявкasи";
-  	dump($curent_step);
+  	//echo "Текущий шаги заявкasи";
+  	//dump($curent_step);
   	if ($curent_step!=$request->id_step){
   		return view ('closestep/eror_no_close_step',["id_request"=>$request->id]);
   		// return "";
   	}
-  	$step_id=$step->getTypeStep();
-  	//dump ($step);
+  	$step_id=$step->getStepTypeId();
 
-  	switch ($step_id->id) {
-  		case 1:
-  			return view ('closestep/zabor_corobs',["id_request"=>$id,'containers'=>$containers,'step_model'=>$step]);
-  			break;
-
-  		case 2:
-  		echo "проверка шага со сканированием коробов";
-  		return view ('closestep/checkcodecorobs',["id_request"=>$id,'containers'=>$containers,'step_model'=>$step]);
-  			break;
-
-  		case 3:
-  			return view ('closestep/closestep_no_check',["id_request"=>$id,'step_model'=>$step]);
-  			break;
-
-  		case 5:
-  			return view ('closestep/pogruzka_na_polki',["id_request"=>$id,'containers'=>$containers,'step_model'=>$step]);
-  			break;
-  		
-  		default:
-  			return "Выполняется закрытие шага";
-  			break;
-  	}
-
-  	/*
-	1 забор у клиента
+  	  	/*
+1 забор у клиента
 2 погрузка в машину
 3 транспортировка
 
@@ -83,6 +68,35 @@ class RequestController extends Controller
 
 
   	*/
+  	switch ($step_id) {
+  		case 1:
+  			return view ('closestep/zabor_corobs',["id_request"=>$id,'containers'=>$containers,'step_model'=>$step]);
+  			break;
+
+  		case 2:
+  		echo "проверка шага со сканированием коробов";
+  		return view ('closestep/checkcodecorobs',["id_request"=>$id,'containers'=>$containers,'step_model'=>$step]);
+  			break;
+
+  		case 3:
+  			return view ('closestep/closestep_no_check',["id_request"=>$id,'step_model'=>$step]);
+  			break;
+  		case 4:
+  		echo "проверка шага со сканированием коробов";
+  		return view ('closestep/checkcodecorobs',["id_request"=>$id,'containers'=>$containers,'step_model'=>$step]);
+  			break;
+
+  		case 5:
+  			$containers_new=$reqInfo->showContainersandCells();
+  			return view ('closestep/pogruzka_na_polki',["id_request"=>$id,'containers'=>$containers_new,'step_model'=>$step,'company'=>$company]);
+  			break;
+  		
+  		default:
+  			return "Выполняется закрытие шага";
+  			break;
+  	}
+
+
 
   	/*
 		6-Без проверки
@@ -107,12 +121,12 @@ class RequestController extends Controller
 	$id=$this->Clear($request->id);
   	$reqInfo=new RequestInfo($id);
   	$containers=$reqInfo->showContainers();
-  	return view ('requestaddCorobs',["id_request"=>$request->id,'containers'=>$containers]);
+  	return view ('requestaddCorobs',["id_request"=>$id,'containers'=>$containers]);
   }
   public function createParametrs()
 	  {
 		    $citys=DB::table('city')->where('deleted',0)->get();
-		    $client_organisations=DB::table('client_organisation')->where('deleted',0)->get();
+		    $client_organisations=DB::table('client_organisation')->where('deleted','<>',1)->get();
 		    $bps=DB::table('business_process')->where('deleted',0)->get();
 		    $storage=DB::table('storage')->get();
 		    $arr_city= array();

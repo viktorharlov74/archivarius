@@ -21,6 +21,7 @@
         <div class="row mt-4">
              <div class="col-md-6 offset-3 mt-4">
                 <h3>Ошибка. Этот шаг или не начат или уже закончен. <a href='/request/<?=$id_request?>'>Вернуться к заявке</a></h3>
+                <h4> Здесь будет история Шага! </h4>
              </div>
              <div class="col-md-3"></div> 
         </div>

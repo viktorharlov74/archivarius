@@ -17,7 +17,7 @@
             @endif -->
 
 
-    <div class="container">
+    <div class="container">qw2
       <div class="row">
             <div class="col-md-6 offset-3" style="text-align: center;">
                 <h1 class=" m-b-md">Закрытие шага <?=$step_model->name_step?></h1>
@@ -32,19 +32,23 @@
              </div>
              <div class="col-md-3"></div> 
         </div>
-      <div class="row mt-3">
+      <div class="row mt-3" style="border-bottom: 2px solid black;">
          
             <div class="col-md-3">Контейнер</div>
-            <div class="col-md-3">Дедлайн</div>
             <div class="col-md-3">Контейнер</div>
-            <div class="col-md-3">Дедлайн</div>
+            <div class="col-md-3">Контейнер</div>
+            <div class="col-md-3">Контейнер</div>
+
+
+
 
         </div>
-        <div class="row mt-2">
+
+        <div class="row mt-2 oldcontainers">
        <?php if (count($containers)>0){ foreach ($containers as $container ) {?>
-            <!-- <?var_dump($container);?> -->
+            
             <div class="col-md-3">{{$container->barcode}}</div>
-            <div class="col-md-3">{{$container->deadline}}</div>
+            
 
 
 
@@ -56,9 +60,11 @@
              <div class="col-md-6 offset-3">
                 <div class="title m-b-md">Добавление коробов в заявку</div>
              </div>
-             <div class="col-md-3"></div> 
+
+             <div class="col-md-3 acthref"><div class="preload" id="loader" style="display: none;"><img src="/images/wait.gif" width="25" height="25"></div><button type="submit" class="btn btn-primary"  id="createAct">Получить АктПередачи коробов</button>
+             <button type="submit" class="btn btn-primary mt-3"  id="closestep">Закрыть шаг</button></div> 
         </div>
-        <form action="">
+        <form action="" class="addCorobsForm">
                <div class="row" id="rowform">
                 <div class="col-sm-3" id="start">
                     <input type="text" id="inputas2" class="form-control" placeholder="Text input">                
@@ -74,18 +80,27 @@
              
         </div>
         </form>
-        <button type="submit" class="btn btn-primary">Завершить добавление коробов</button>
+         <button type="submit" class="btn btn-primary"   id="sendNoServCoronbs">Отправить короба на сервер</button>
+        <!-- <button type="submit" class="btn btn-primary"  id="closestep">Завершить добавление коробов</button> -->
+        <div class="closestep col-md-8 offset-2"></div>
+        
     </div>
+    <script src="{{ asset('js/main.js') }}"></script>
         <script type="text/javascript">
-
-            function sendContainerAjax(container,pole){
+            var id_request=<?=$id_request?>;
+            var id_step=<?=$step_model->id_step?>;
+            var next_status_id=<?=$step_model->next_status_id?>;
+            var token='<?php echo(csrf_token()); ?>';
+            var data_info={id_req:id_request,id_step:id_step,next_status_id:next_status_id};
+            
+            /*function sendContainerAjax(container,pole){
               //TODO: Добавить фронт проверку на ошибки
-              $.ajax({
+             $.ajax({
                 url: '/requestajax/<?=$id_request?>/addCorobs',
                 method: 'post',
                   dataType: 'html',
                 headers: {
-                'X-CSRF-Token':'<?php echo(csrf_token()); ?>'
+               
                   },
                 data: {corobs: container},
                 success: function(data){
@@ -94,12 +109,33 @@
                   console.log("Данные вернулись успешно");
                 }
               });
-            }
+            }*/
 
 
-                // $("#client-city> option[value='3']").value
-                $(document).ready(function(){
+            $(document).ready(function(){
+              
 
+
+                $('#closestep').click(function(){
+                    closeStep(id_request, data_info, token, id_step);
+                });
+                $('#createAct').click(function(){
+                  $(this).hide(); 
+                  console.log("Хотим получить акт передачи коробов");
+                  createActCorobs(id_request, data_info, token, id_step);
+
+                });
+
+                $('#sendNoServCoronbs').click(function(){
+                    console.log("Отправляем короба на сервер");
+                  var corobs=[];
+                    $('.form-control[sentserv="false"]').each(function(){
+                    var temp=$(this).val();
+                    sendContainerAjax($(this).val(),$(this),id_request,data_info,token,"addCorobs");
+                    corobs.push(temp)
+                    });
+                  console.log(corobs);
+                });
 
                     var id_all=2;
                     var selector_start="#start";
@@ -114,7 +150,8 @@
                             if (allcorobs.indexOf($(this).val())=="-1"){
                                 allcorobs.push($(this).val());
                                 if(navigator.onLine) {
-                                  sendContainerAjax($(this).val(),$(this));
+                                  sendContainerAjax($(this).val(),$(this),id_request,data_info,token,"addCorobs");
+                                  // sendContainerAjax($(this).val(),$(this));
                                   $(this).prop('disabled',true);
                                   //TODO: Добавить фронт проверку на ошибки
                                 }

@@ -41,7 +41,7 @@
         </div>
         <div class="row mt-2">
        <?php if (count($containers)>0){ foreach ($containers as $container ) {?>
-            <!-- <?var_dump($container);?> -->
+
             <div class="col-md-3">{{$container->barcode}}</div>
             <div class="col-md-3">{{$container->status_id}}</div>
 
@@ -56,7 +56,7 @@
              </div>
              <div class="col-md-3"></div> 
         </div>
-        <form action="">
+        <form action="" class="addCorobsForm">
                <div class="row" id="rowform">
                 <div class="col-sm-3" id="start">
                     <input type="text" id="inputas2" class="form-control" placeholder="Text input">                
@@ -72,10 +72,15 @@
              
         </div>
         </form>
+        <a href='/request/<?=$id_request?>'>Вернуться к заявке</a>
 
         <? //dump($step_model);?>
         
     </div>
+
+    @push('scripts')
+    <script src="{{ asset('js/test.js' }}"></script>
+      @endpush
         <script type="text/javascript">
 
           $(document).ready(function(){

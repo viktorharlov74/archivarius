@@ -154,18 +154,53 @@
                         $('#btn-create-request').prop('disabled',false);
                     });
                     
-                    
+                        function createRequest(){
+                            var city=$("#client-city").val();
+                            var client_company=$("#client-company").val();
+                            var BP=$("#BP").val();
+                            var zabor=$("#zabor").val();
+                            var skald_poluch=$("#skald_poluch").val();
+                            var data={city:city,organzitaion:client_company,BP:BP,otprv:zabor,sklad_poluch:skald_poluch};
+                            console.log(data);
+
+
+                          $.ajax({
+                            url: '/requestajax/createRequest',
+                            method: 'post',
+                            dataType: 'html',
+                            headers: {
+                            'X-CSRF-Token':'<?php echo(csrf_token()); ?>'
+                              },
+                            data: data,
+                            success: function(data){
+                                data=jQuery.parseJSON(data);
+                                
+                                if (data.res==true){
+                                    var ahref='<a href="/request/'+data.id+'">Перейти к заявке</a>';
+                                     $("#btn-create-request").after(ahref);
+                                }
+                                var value='<h1>'+data.value+'</h1>';
+                                $("#btn-create-request").after(value);
+                                $("#btn-create-request").hide();
+                              //data=JSON.parse(data);
+
+                              // console.log(data);
+                            }
+                          });
+                      }
 
                           $('#btn-create-request').click(function(){
-                            var data={"city":"","organzitaion":"","BP":"","otprv":"","sklad_poluch":""};
-                             $.ajax({
-                              type:'POST',
-                              url:'/api/token/request/add',
-                              data:'_token = <? echo csrf_token(); ?>',
-                              success:function(data){
-                                 $("#msg").html(data.msg);
-                              }
-                           });
+                           //  var data={city:"",organzitaion:"",BP:"",otprv:"",sklad_poluch:""};
+                           //   $.ajax({
+                           //    type:'POST',
+                           //    url:'/api/token/request/add',
+                           //    data:'_token = <? echo csrf_token(); ?>',
+                           //    success:function(data){
+                           //       $("#msg").html(data.msg);
+                           //    }
+                           // });
+
+                           createRequest();
                           
                        });
 
